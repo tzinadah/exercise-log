@@ -49,11 +49,14 @@ server.get("/:username/log", (req, res) => {
 });
 
 server.get("/users", (req, res) => {
-  User.find({}, { username: 1, exercises: 0, _id: 0, __v: 0 })
+  User.find({}, { username: 1, _id: 0 })
     .then((users) => {
       res.status(200).json(users);
     })
-    .catch((err) => res.status(500).json({ message: "Internal server error" }));
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ message: "Internal server error" });
+    });
 });
 
 server.get("/:username", (req, res) => {
@@ -88,6 +91,31 @@ server.post("/users", (req, res) => {
     });
 });
 
+server.post("/:username", (req, res) => {
+  User.findOne({ username: req.params.username })
+    .then((user) => {
+      if (user) {
+        user.exercises.push({
+          description: req.body.description,
+          duration: Number(req.body.duration),
+          date: req.body.date ? req.body.date : Date.now(),
+        });
+        user
+          .save()
+          .then(() => {
+            res.status(201).json({ message: "Added exercise" });
+          })
+          .catch((err) => {
+            res.status(500).json({ message: "Internal server error" });
+          });
+      } else {
+        res.status(404).json({ message: "Username wasn't found" });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({ message: "Internal server error" });
+    });
+});
 // Starting server
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
