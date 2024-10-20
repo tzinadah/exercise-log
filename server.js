@@ -24,7 +24,7 @@ server.use((req, res, next) => {
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 
-// Static get endpoints
+// Get endpoints
 server.get("/", (req, res) => {
   res.sendFile(__dirname + "/public/index.html");
 });
@@ -34,8 +34,13 @@ server.get("/register", (req, res) => {
 });
 
 server.get("/:username/log", (req, res) => {
+  // TODO check validity of username
   res.sendFile(__dirname + "/public/exercise-form.html");
 });
+
+server.post("/register", (req,res)){
+       
+}
 
 // Starting server
 server.listen(PORT, () => {
