@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Exercise log api",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "test": "node --watch server.js",
     "start": "node server.js"
