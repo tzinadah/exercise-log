@@ -27,16 +27,47 @@ server.use(express.urlencoded({ extended: true }));
 
 // Get endpoints
 server.get("/", (req, res) => {
-  res.sendFile(__dirname + "/public/index.html");
+  res.status(200).sendFile(__dirname + "/public/index.html");
 });
 
 server.get("/register", (req, res) => {
-  res.sendFile(__dirname + "/public/user-form.html");
+  res.status(200).sendFile(__dirname + "/public/user-form.html");
 });
 
 server.get("/:username/log", (req, res) => {
-  // TODO check validity of username
-  res.sendFile(__dirname + "/public/exercise-form.html");
+  User.findOne({ username: req.params.username })
+    .then((user) => {
+      if (user) {
+        res.status(200).sendFile(__dirname + "/public/exercise-form.html");
+      } else {
+        res.status(404).json({ message: "Username wasn't found" });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({ message: "Internal server error" });
+    });
+});
+
+server.get("/users", (req, res) => {
+  User.find({}, { username: 1, exercises: 0, _id: 0, __v: 0 })
+    .then((users) => {
+      res.status(200).json(users);
+    })
+    .catch((err) => res.status(500).json({ message: "Internal server error" }));
+});
+
+server.get("/:username", (req, res) => {
+  User.findOne({ username: req.params.username })
+    .then((user) => {
+      if (user) {
+        res.status(200).json(user.exercises);
+      } else {
+        res.status(404).json({ message: "Username wasn't found" });
+      }
+    })
+    .catch((err) => {
+      res.status(500).json({ message: "Internal server error" });
+    });
 });
 
 // Post endpoints
@@ -45,11 +76,9 @@ server.post("/users", (req, res) => {
   user
     .save()
     .then((savedUser) => {
-      console.log(`Saved document ${savedUser}`);
       res.status(201).json({ message: "User created succesfully" });
     })
     .catch((err) => {
-      console.error(err);
       // handles duplicates
       if (err.code === 11000) {
         res.status(409).json({ message: "Username already exists" });
