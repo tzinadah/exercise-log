@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import User from "./models/User.js";
 
 // Init
 dotenv.config();
@@ -38,9 +39,25 @@ server.get("/:username/log", (req, res) => {
   res.sendFile(__dirname + "/public/exercise-form.html");
 });
 
-server.post("/register", (req,res)){
-       
-}
+// Post endpoints
+server.post("/users", (req, res) => {
+  const user = new User({ username: req.body.username, exercises: [] });
+  user
+    .save()
+    .then((savedUser) => {
+      console.log(`Saved document ${savedUser}`);
+      res.status(201).json({ message: "User created succesfully" });
+    })
+    .catch((err) => {
+      console.error(err);
+      // handles duplicates
+      if (err.code === 11000) {
+        res.status(409).json({ message: "Username already exists" });
+      } else {
+        res.status(500).json({ message: "Internal server error" });
+      }
+    });
+});
 
 // Starting server
 server.listen(PORT, () => {
