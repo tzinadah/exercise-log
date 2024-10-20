@@ -33,7 +33,7 @@ server.get("/register", (req, res) => {
   res.sendFile(__dirname + "/public/user-form.html");
 });
 
-server.get("/register", (req, res) => {
+server.get("/:username/log", (req, res) => {
   res.sendFile(__dirname + "/public/exercise-form.html");
 });
 

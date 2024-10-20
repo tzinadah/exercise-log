@@ -6,5 +6,5 @@ GET /register -> return registery page
 GET /users -> return json file of all usernames
 GET /$username/log -> return page for adding exercise
 GET /$username -> return exercies of a user
-POST /register/submit -> adds username to users
-POST /$username/log/submit -> add exercies 
+POST /users -> adds username to users
+POST /$username -> add exercies 
